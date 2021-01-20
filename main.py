@@ -14,8 +14,12 @@ def is_iss_overhead():
 	response.raise_for_status()
 	data = response.json()
 
-	iss_latitude = float(data["iss_position"]["latitude"])
-	iss_longitude = float(data["iss_position"]["longitude"])
+	longitude = data["iss_position"]["longitude"]
+	latitude = data["iss_position"]["latitude"]
+
+	iss_position = (longitude, latitude)
+ 
+	print(F"ISS POSITION: {iss_position}") 
 
 	#Your position is within +5 or -5 degrees of the ISS position.
 	if MY_LAT-5 <= iss_latitude  <= MY_LAT+5 and MY_LONG-5 <= iss_longitude <= MY_LONG+5:
@@ -32,10 +36,18 @@ def night_time():
 	response = requests.get("https://api.sunrise-sunset.org/json", params=parameters)
 	response.raise_for_status()
 	data = response.json()
-	sunrise = int(data["results"]["sunrise"].split("T")[1].split(":")[0])
-	sunset = int(data["results"]["sunset"].split("T")[1].split(":")[0])
-
+	 
+	MY_ZONE = ZoneInfo("America/Louisville")   
+	time_now = str(datetime.now(tz=MY_ZONE)).split(" ")[1].split(":")
+	sunrise = str(datetime.fromisoformat(data["results"]["sunrise"]).astimezone(tz=MY_ZONE)).split(" ")[1].split(":")
+	sunset = str(datetime.fromisoformat(data["results"]["sunset"]).astimezone(tz=MY_ZONE)).split(" ")[1].split(":")
+	 
+	print(f"sunrise: {sunrise[0]}")      
+	print(f"sunset: {sunset[0]}")       
+	 
 	time_now = datetime.now()
+	 
+	print(f"time_now_hour : {time_now.hour}")  
 
 	if time_now >= sunset or time_now <= sunrise:
 		return True
